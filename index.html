@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Salones - Control de Ubicaciones</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    
+    <div id="app-container">
+        <!-- Barra Lateral Principal (Sidebar) -->
+        <aside id="sidebar" class="sidebar">
+            <header class="sidebar-header">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined logo-icon">location_on</span>
+                    <h1>AC Salones Map</h1>
+                </div>
+                <div class="search-box">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="search-input" placeholder="Buscar salón, empresa...">
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-type="all">Todos</button>
+                    <button class="filter-btn" data-type="Salón">Salones</button>
+                    <button class="filter-btn" data-type="Empresa">Empresas</button>
+                </div>
+            </header>
+
+            <div id="locations-list" class="locations-list">
+                <!-- Los items se inyectarán vía JS -->
+            </div>
+            
+            <footer class="sidebar-footer">
+                <button id="btn-open-agenda" class="btn-agenda" title="Abrir Agenda de Contactos">
+                    <span class="material-symbols-outlined">contact_phone</span>
+                    Agenda de Contactos
+                </button>
+            </footer>
+        </aside>
+
+        <!-- Panel de Agenda de Contactos -->
+        <aside id="agenda-panel" class="detail-panel hidden" style="z-index: 25; left: 400px;">
+            <button id="close-agenda" class="close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="detail-content">
+                <div class="detail-header" style="margin-top: 20px;">
+                    <h2>Agenda de Contactos</h2>
+                    <p style="color: var(--text-muted); font-size: 14px;">Directorio de servicios y personal</p>
+                </div>
+                
+                <div class="filters" style="margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+                    <button class="filter-btn-agenda active" data-type="all">Todos</button>
+                    <button class="filter-btn-agenda" data-type="Central">Central</button>
+                    <button class="filter-btn-agenda" data-type="Técnico AC">Técnicos AC</button>
+                    <button class="filter-btn-agenda" data-type="Distribuidor">Distribuidores</button>
+                    <button class="filter-btn-agenda" data-type="Servicio Técnico">SAT</button>
+                </div>
+                
+                <button id="btn-new-contact" class="save-btn" style="margin-bottom: 16px; padding: 10px; font-size: 14px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span> Añadir Contacto
+                </button>
+
+                <div id="contacts-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Los contactos se inyectarán vía JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Panel de Detalles Superpuesto (Detail View) -->
+        <aside id="detail-panel" class="detail-panel hidden">
+            <button id="close-detail" class="close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div id="detail-content" class="detail-content">
+                <!-- El contenido de detalle se inyectará vía JS -->
+            </div>
+        </aside>
+
+        <!-- Formulario de Edición Superpuesto -->
+        <aside id="edit-panel" class="detail-panel hidden" style="z-index: 30; left: 800px;">
+            <button id="close-edit" class="close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="detail-content">
+                <div class="detail-header" style="margin-top: 20px;">
+                    <h2>Añadir Información</h2>
+                    <p style="color: var(--text-muted); font-size: 14px;" id="edit-location-name"></p>
+                </div>
+                
+                <form id="data-form" style="display: flex; flex-direction: column; gap: 16px;">
+                    <input type="hidden" id="edit-id">
+                    
+                    <div class="form-group">
+                        <label>Teléfono Contacto</label>
+                        <input type="text" id="edit-phone" class="form-input" placeholder="Ej. +34 928...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Contacto</label>
+                        <input type="email" id="edit-email" class="form-input" placeholder="correo@acsalones.es">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Encargado</label>
+                        <input type="text" id="edit-manager" class="form-input" placeholder="Nombre completo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Operarios (separados por coma)</label>
+                        <textarea id="edit-operators" class="form-input" rows="2" placeholder="Juan, María, Luis..."></textarea>
+                    </div>
+
+                    <div class="form-group" id="group-techbox">
+                        <label>Número de Caja Técnica</label>
+                        <input type="text" id="edit-techbox" class="form-input" placeholder="CT-...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="edit-observations" class="form-input" rows="3" placeholder="Detalles a tener en cuenta..."></textarea>
+                    </div>
+                    
+                    <button type="submit" id="save-btn" class="save-btn">
+                        <span class="material-symbols-outlined">save</span> Guardar Datos
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Formulario de Edición de Contactos -->
+        <aside id="edit-contact-panel" class="detail-panel hidden" style="z-index: 35; left: 800px;">
+            <button id="close-contact-edit" class="close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="detail-content">
+                <div class="detail-header" style="margin-top: 20px;">
+                    <h2 id="contact-form-title">Añadir Contacto</h2>
+                    <p style="color: var(--text-muted); font-size: 14px;">Directorio</p>
+                </div>
+                
+                <form id="contact-form" style="display: flex; flex-direction: column; gap: 16px;">
+                    <input type="hidden" id="edit-contact-id">
+                    
+                    <div class="form-group">
+                        <label>Nombre del Contacto / Empresa</label>
+                        <input type="text" id="edit-contact-name" class="form-input" placeholder="Ej. Juan Pérez" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="edit-contact-category" class="form-input">
+                            <option value="Central">Central</option>
+                            <option value="Técnico AC">Técnico AC</option>
+                            <option value="Distribuidor">Distribuidor</option>
+                            <option value="Servicio Técnico">Servicio Técnico</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="edit-contact-phone" class="form-input" placeholder="Ej. +34 928...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Información Extra (Email, Horario...)</label>
+                        <input type="text" id="edit-contact-extra" class="form-input" placeholder="correo@acsalones.es">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="edit-contact-obs" class="form-input" rows="3" placeholder="Detalles a tener en cuenta..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="save-btn">
+                        <span class="material-symbols-outlined">save</span> Guardar Contacto
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Contenedor del Mapa Embebido -->
+        <main id="map-container">
+            <!-- Embebemos el enlace tal cual lo ve el usuario -->
+            <iframe 
+                id="map-iframe"
+                src="https://www.google.com/maps/d/u/0/embed?mid=1PIF4MtsWShAjzFKoaUbBQCNv1VjdxrM" 
+                width="100%" 
+                height="100%" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </main>
+    </div>
+
+    <!-- Lógica de la app -->
+    <script src="app.js"></script>
+</body>
+</html>
