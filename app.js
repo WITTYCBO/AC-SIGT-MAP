@@ -4,6 +4,7 @@ const SCRIPT_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
 let locationsData = [];
 let contactsData = [];
 let activeLocation = null;
+let sessionPassword = ""; // Guardar la contraseña de la sesión actual
 
 // DOM Elements
 const listContainer = document.getElementById('locations-list');
@@ -28,6 +29,12 @@ const closeContactEditBtn = document.getElementById('close-contact-edit');
 const contactForm = document.getElementById('contact-form');
 const btnNewContact = document.getElementById('btn-new-contact');
 
+// Login Elements
+const loginOverlay = document.getElementById('login-overlay');
+const loginForm = document.getElementById('login-form');
+const pwdInput = document.getElementById('login-pwd');
+const loginError = document.getElementById('login-error');
+
 // Loader Overlay
 function showLoading(show, text = 'Cargando datos...') {
     let overlay = document.getElementById('loading-overlay');
@@ -49,82 +56,42 @@ function showLoading(show, text = 'Cargando datos...') {
 
 // Fetch Data from Google Sheets
 async function loadData() {
+    if (!sessionPassword) return; // No intentamos cargar sin contraseña
+
     // Si no hay URL, cargamos datos por defecto para que no se vea vacío mientras se configura
     if (SCRIPT_URL === "TU_URL_DE_APPS_SCRIPT_AQUI" || SCRIPT_URL === "") {
         console.warn("No hay SCRIPT_URL configurada. Mostrando ejemplo por defecto.");
-        locationsData = [
-            { id: "1", name: "SUN CITY", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "2", name: "CRYSTAL PARK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "3", name: "CESARS PALACE", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "4", name: "OCEAN", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "5", name: "PARAISO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "6", name: "PREMIUM", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "7", name: "PLAZA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "8", name: "ROYAL CASINO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "9", name: "NEW YORK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "10", name: "CARIBE", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "11", name: "CALIFORNIA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "12", name: "FLORIDA PARK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "13", name: "MANHATTAN", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "14", name: "AMERICA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "15", name: "ATLANTIC", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "16", name: "FORTUNA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "17", name: "BELLAGIO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "18", name: "CANADA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "19", name: "BAHAMAS", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "20", name: "TEIDE", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "21", name: "BLACK JACK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "22", name: "NEVADA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "23", name: "NEW RALLY", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "24", name: "HABANA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "25", name: "CARACAS", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "26", name: "CENTRAL PARK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "27", name: "LAS VEGAS", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "28", name: "ALASKA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "29", name: "TROPICAL", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "30", name: "CENTRAL AC", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "31", name: "LA VILLA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "32", name: "NEW CENTER", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "33", name: "BRAZIL", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "34", name: "POKER", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "35", name: "AVENIDA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "36", name: "ZAFIRO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "37", name: "SAHARA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "38", name: "NIAGARA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "39", name: "VENECIA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "40", name: "LAGUNA PARK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "41", name: "LOS ANGELES", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "42", name: "LUCKY", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "43", name: "OASIS", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "44", name: "PARIS", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "45", name: "GALAXY", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "46", name: "MONTECARLO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "47", name: "DETROIT", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "48", name: "MONACO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "49", name: "EUROPA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "50", name: "GOLDEN", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "51", name: "MILENIUN", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "52", name: "AFRICA", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "53", name: "LETI", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
-            { id: "54", name: "PALACE", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" }
-        ];
-
-        contactsData = [
-            { id: "c1", category: "Central", name: "Soporte Central", phone: "+34 928 000 000", extraInfo: "Lunes a Viernes 8-16h", obs: "Avisar en caso de caída del servidor general." },
-            { id: "c2", category: "Técnico AC", name: "Juan Pérez (AC Sur)", phone: "600 111 222", extraInfo: "Mantenimiento Preventivo", obs: "Llamar directo para urgencias climáticas." },
-            { id: "c3", category: "Distribuidor", name: "Distribuciones Bebidas Canarias", phone: "922 444 555", extraInfo: "pedidos@dbc.es", obs: "" },
-            { id: "c4", category: "Servicio Técnico", name: "Mantenimiento Eléctrico SA", phone: "699 888 777", extraInfo: "Urgencias 24h", obs: "Contrato firmado hasta finales de año." }
-        ];
-
-        renderList(locationsData);
-        renderContactsList(contactsData);
-        alert("Atención: Aún no has enlazado el Google Sheets. Se muestran datos de ejemplo. Sigue las instrucciones para desplegar el backend.");
+        if(sessionPassword === "1234") {
+            // Mock test for default password
+            locationsData = [
+                { id: "1", name: "SUN CITY", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
+                { id: "2", name: "CRYSTAL PARK", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
+                { id: "3", name: "CESARS PALACE", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
+                { id: "4", name: "OCEAN", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" },
+                { id: "5", name: "PARAISO", type: "Salón", address: "", phone: "", email: "", manager: "", operators: "", techBox: "", observations: "" }
+            ];
+            contactsData = [
+                { id: "c1", category: "Central", name: "Soporte Central", phone: "+34 928 000 000", extraInfo: "Lunes a Viernes 8-16h", obs: "Avisar en caso de caída del servidor general." }
+            ];
+            renderList(locationsData);
+            renderContactsList(contactsData);
+            
+            // Ocultamos la pantalla de login
+            loginOverlay.style.opacity = '0';
+            setTimeout(() => { loginOverlay.style.display = 'none'; }, 300);
+            
+            alert("Atención: Aún no has enlazado el Google Sheets. Se muestran datos de ejemplo. Sigue las instrucciones para desplegar el backend.");
+        } else {
+            loginError.innerText = "Contraseña incorrecta (Usa '1234' para simulación sin backend)";
+            loginError.style.display = "block";
+            sessionPassword = "";
+        }
         return;
     }
 
     try {
-        showLoading(true, 'Cargando base de datos...');
-        const response = await fetch(`${SCRIPT_URL}?action=get`);
+        showLoading(true, 'Cargando base de datos y verificando...');
+        const response = await fetch(`${SCRIPT_URL}?action=get&pwd=${encodeURIComponent(sessionPassword)}`);
         const result = await response.json();
         
         if (result.success) {
@@ -134,16 +101,37 @@ async function loadData() {
             }
             renderList(locationsData);
             renderContactsList(contactsData);
+            
+            // Ocultamos la pantalla de login tras éxito
+            loginOverlay.style.opacity = '0';
+            setTimeout(() => { loginOverlay.style.display = 'none'; }, 300);
+            loginError.style.display = "none";
         } else {
             console.error("Error cargando datos:", result.error);
-            alert("Hubo un error al cargar los datos del sistema.");
+            sessionPassword = ""; // Resetear en caso de fallo
+            loginError.innerText = result.error || "Contraseña incorrecta";
+            loginError.style.display = "block";
         }
     } catch (error) {
         console.error("Fetch error:", error);
+        sessionPassword = "";
+        loginError.innerText = "Error de conexión con el servidor";
+        loginError.style.display = "block";
     } finally {
         showLoading(false);
     }
 }
+
+// Evento Submit de Login
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const pwd = pwdInput.value.trim();
+    if(pwd) {
+        sessionPassword = pwd;
+        loginError.style.display = 'none';
+        loadData();
+    }
+});
 
 // Renderizar lista lateral
 function renderList(dataToRender) {
@@ -281,6 +269,7 @@ dataForm.addEventListener('submit', async (e) => {
 
     const formData = {
         action: 'update',
+        pwd: sessionPassword,
         id: document.getElementById('edit-id').value,
         phone: document.getElementById('edit-phone').value,
         email: document.getElementById('edit-email').value,
@@ -478,6 +467,7 @@ contactForm.addEventListener('submit', async (e) => {
     
     const formData = {
         action: isNew ? 'addContact' : 'updateContact',
+        pwd: sessionPassword,
         id: id,
         name: document.getElementById('edit-contact-name').value,
         category: document.getElementById('edit-contact-category').value,
@@ -526,6 +516,7 @@ async function deleteContact(id) {
         
         const formData = {
             action: 'deleteContact',
+            pwd: sessionPassword,
             id: id
         };
         
@@ -551,4 +542,5 @@ async function deleteContact(id) {
 }
 
 // Inicialización
-window.onload = loadData;
+// Ya no llamamos a loadData() directamente; esperamos a que el usuario se loguee en la pantalla inicial.
+// window.onload = loadData;

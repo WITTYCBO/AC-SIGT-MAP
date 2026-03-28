@@ -35,6 +35,30 @@ body, html {
     position: relative;
 }
 
+/* LOGIN OVERLAY */
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-dark); /* Solid background to completely hide app */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.login-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 32px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--shadow);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
 /* SIDEBAR PRINCIPAL */
 .sidebar {
     width: 400px;

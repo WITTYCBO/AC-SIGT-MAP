@@ -14,6 +14,24 @@
 </head>
 <body>
     
+    <!-- Pantalla de Login -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-card">
+            <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
+                <span class="material-symbols-outlined logo-icon" style="font-size: 40px;">lock</span>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 8px;">MapApp Login</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 24px; font-size: 14px;">Introduce la contraseña para acceder</p>
+            
+            <form id="login-form">
+                <input type="password" id="login-pwd" class="form-input" placeholder="Contraseña..." required style="margin-bottom: 16px;">
+                <button type="submit" class="save-btn" id="btn-login" style="margin-top: 0;">
+                    <span class="material-symbols-outlined">login</span> Entrar
+                </button>
+            </form>
+            <div id="login-error" style="color: #ef4444; font-size: 13px; text-align: center; margin-top: 12px; display: none;">Contraseña incorrecta</div>
+        </div>
+    </div>
     <div id="app-container">
         <!-- Barra Lateral Principal (Sidebar) -->
         <aside id="sidebar" class="sidebar">
