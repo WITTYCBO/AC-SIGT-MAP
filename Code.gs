@@ -11,9 +11,9 @@
 // 7. Copia la "URL de la aplicación web" y pégala en app.js (en SCRIPT_URL).
 //========================================================================================
 
-const SPREADSHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
-const SHEET_NAME = 'DatosMapa';
-const AGENDA_SHEET_NAME = 'Hoja 1';
+const SPREADSHEET_ID = '1kXgyIhdU9feHpOec9sHHQTLjtX33r69-uTY5_uxKDFM';
+const SHEET_NAME = 'salas';
+const AGENDA_SHEET_NAME = 'contactos';
 
 // CONTRASEÑA DE ACCESO A LA APLICACIÓN (Cámbiala por una más segura)
 const APP_PASSWORD = "1234";
@@ -240,4 +240,76 @@ function doOptions(e) {
   return ContentService.createTextOutput("")
     .setMimeType(ContentService.MimeType.JSON)
     .setHeaders(headers);
+}
+
+// =========================================================
+// FUNCIÓN TEMPORAL PARA CARGAR LOS 54 SALONES AUTOMÁTICAMENTE
+// =========================================================
+function loadInitialData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+  }
+  sheet.clear(); // Limpiamos para evitar duplicados
+  
+  const rawData = [
+    ['id', 'name', 'type', 'address', 'phone', 'email', 'manager', 'operators', 'techBox', 'observations'],
+    ['1', 'SUN CITY', 'Salón', '', '', '', '', '', '', ''],
+    ['2', 'CRYSTAL PARK', 'Salón', '', '', '', '', '', '', ''],
+    ['3', 'CESARS PALACE', 'Salón', '', '', '', '', '', '', ''],
+    ['4', 'OCEAN', 'Salón', '', '', '', '', '', '', ''],
+    ['5', 'PARAISO', 'Salón', '', '', '', '', '', '', ''],
+    ['6', 'PREMIUM', 'Salón', '', '', '', '', '', '', ''],
+    ['7', 'PLAZA', 'Salón', '', '', '', '', '', '', ''],
+    ['8', 'ROYAL CASINO', 'Salón', '', '', '', '', '', '', ''],
+    ['9', 'NEW YORK', 'Salón', '', '', '', '', '', '', ''],
+    ['10', 'CARIBE', 'Salón', '', '', '', '', '', '', ''],
+    ['11', 'CALIFORNIA', 'Salón', '', '', '', '', '', '', ''],
+    ['12', 'FLORIDA PARK', 'Salón', '', '', '', '', '', '', ''],
+    ['13', 'MANHATTAN', 'Salón', '', '', '', '', '', '', ''],
+    ['14', 'AMERICA', 'Salón', '', '', '', '', '', '', ''],
+    ['15', 'ATLANTIC', 'Salón', '', '', '', '', '', '', ''],
+    ['16', 'FORTUNA', 'Salón', '', '', '', '', '', '', ''],
+    ['17', 'BELLAGIO', 'Salón', '', '', '', '', '', '', ''],
+    ['18', 'CANADA', 'Salón', '', '', '', '', '', '', ''],
+    ['19', 'BAHAMAS', 'Salón', '', '', '', '', '', '', ''],
+    ['20', 'TEIDE', 'Salón', '', '', '', '', '', '', ''],
+    ['21', 'BLACK JACK', 'Salón', '', '', '', '', '', '', ''],
+    ['22', 'NEVADA', 'Salón', '', '', '', '', '', '', ''],
+    ['23', 'NEW RALLY', 'Salón', '', '', '', '', '', '', ''],
+    ['24', 'HABANA', 'Salón', '', '', '', '', '', '', ''],
+    ['25', 'CARACAS', 'Salón', '', '', '', '', '', '', ''],
+    ['26', 'CENTRAL PARK', 'Salón', '', '', '', '', '', '', ''],
+    ['27', 'LAS VEGAS', 'Salón', '', '', '', '', '', '', ''],
+    ['28', 'ALASKA', 'Salón', '', '', '', '', '', '', ''],
+    ['29', 'TROPICAL', 'Salón', '', '', '', '', '', '', ''],
+    ['30', 'CENTRAL AC', 'Salón', '', '', '', '', '', '', ''],
+    ['31', 'LA VILLA', 'Salón', '', '', '', '', '', '', ''],
+    ['32', 'NEW CENTER', 'Salón', '', '', '', '', '', '', ''],
+    ['33', 'BRAZIL', 'Salón', '', '', '', '', '', '', ''],
+    ['34', 'POKER', 'Salón', '', '', '', '', '', '', ''],
+    ['35', 'AVENIDA', 'Salón', '', '', '', '', '', '', ''],
+    ['36', 'ZAFIRO', 'Salón', '', '', '', '', '', '', ''],
+    ['37', 'SAHARA', 'Salón', '', '', '', '', '', '', ''],
+    ['38', 'NIAGARA', 'Salón', '', '', '', '', '', '', ''],
+    ['39', 'VENECIA', 'Salón', '', '', '', '', '', '', ''],
+    ['40', 'LAGUNA PARK', 'Salón', '', '', '', '', '', '', ''],
+    ['41', 'LOS ANGELES', 'Salón', '', '', '', '', '', '', ''],
+    ['42', 'LUCKY', 'Salón', '', '', '', '', '', '', ''],
+    ['43', 'OASIS', 'Salón', '', '', '', '', '', '', ''],
+    ['44', 'PARIS', 'Salón', '', '', '', '', '', '', ''],
+    ['45', 'GALAXY', 'Salón', '', '', '', '', '', '', ''],
+    ['46', 'MONTECARLO', 'Salón', '', '', '', '', '', '', ''],
+    ['47', 'DETROIT', 'Salón', '', '', '', '', '', '', ''],
+    ['48', 'MONACO', 'Salón', '', '', '', '', '', '', ''],
+    ['49', 'EUROPA', 'Salón', '', '', '', '', '', '', ''],
+    ['50', 'GOLDEN', 'Salón', '', '', '', '', '', '', ''],
+    ['51', 'MILENIUN', 'Salón', '', '', '', '', '', '', ''],
+    ['52', 'AFRICA', 'Salón', '', '', '', '', '', '', ''],
+    ['53', 'LETI', 'Salón', '', '', '', '', '', '', ''],
+    ['54', 'PALACE', 'Salón', '', '', '', '', '', '', '']
+  ];
+  
+  sheet.getRange(1, 1, rawData.length, rawData[0].length).setValues(rawData);
 }
