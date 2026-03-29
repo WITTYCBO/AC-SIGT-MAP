@@ -314,9 +314,19 @@ function filterData() {
     const activeType = document.querySelector('.filter-btn.active').dataset.type;
     
     const filtered = locationsData.filter(loc => {
-        const matchesTerm = loc.name.toLowerCase().includes(term) || 
-                            loc.address.toLowerCase().includes(term);
-        const matchesType = activeType === 'all' || loc.type === activeType;
+        const safeName = (loc.name || '').toString().toLowerCase();
+        const safeAddress = (loc.address || '').toString().toLowerCase();
+        const matchesTerm = safeName.includes(term) || safeAddress.includes(term);
+        
+        let matchesType = activeType === 'all';
+        if (!matchesType) {
+            const locType = (loc.type || '').toString().trim().toLowerCase();
+            const normalizedLocType = locType.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const normalizedActiveType = activeType.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            matchesType = normalizedLocType.startsWith(normalizedActiveType) || 
+                          normalizedActiveType.startsWith(normalizedLocType);
+        }
         return matchesTerm && matchesType;
     });
     
@@ -350,11 +360,14 @@ function renderContactsList(dataToRender) {
         const item = document.createElement('div');
         item.className = 'contact-card';
         
-        let obsHtml = contact.obs ? `<div class="contact-obs">${contact.obs}</div>` : '';
-        let extraInfoHtml = contact.extraInfo ? `
+        const obsValue = contact.observaciones || contact.obs || '';
+        const emailValue = contact.email || contact.extraInfo || '';
+        
+        let obsHtml = obsValue ? `<div class="contact-obs">${obsValue}</div>` : '';
+        let extraInfoHtml = emailValue ? `
             <div class="contact-info-row">
                 <span class="material-symbols-outlined" style="font-size: 16px;">info</span>
-                ${contact.extraInfo}
+                ${emailValue}
             </div>` : '';
 
         item.innerHTML = `
@@ -401,7 +414,16 @@ filterBtnsAgenda.forEach(btn => {
         if (activeType === 'all') {
             renderContactsList(contactsData);
         } else {
-            const filtered = contactsData.filter(c => c.category === activeType);
+            const filtered = contactsData.filter(c => {
+                const cat = (c.category || '').toString().trim().toLowerCase();
+                const normalizedCat = cat.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const normalizedActiveType = activeType.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                
+                if (normalizedActiveType === "servicio tecnico" && (normalizedCat.includes("sat") || normalizedCat.includes("servicio"))) return true;
+                if (normalizedActiveType === "tecnico ac" && normalizedCat.includes("tecnico")) return true;
+                
+                return normalizedCat.includes(normalizedActiveType) || normalizedActiveType.includes(normalizedCat);
+            });
             renderContactsList(filtered);
         }
     });
@@ -473,7 +495,9 @@ contactForm.addEventListener('submit', async (e) => {
         category: document.getElementById('edit-contact-category').value,
         phone: document.getElementById('edit-contact-phone').value,
         extraInfo: document.getElementById('edit-contact-extra').value,
-        obs: document.getElementById('edit-contact-obs').value
+        email: document.getElementById('edit-contact-extra').value,
+        obs: document.getElementById('edit-contact-obs').value,
+        observaciones: document.getElementById('edit-contact-obs').value
     };
 
     try {
