@@ -637,3 +637,50 @@ select.form-input option {
     background: rgba(255,255,255,0.1);
     border-color: rgba(255,255,255,0.2);
 }
+
+/* =========================================
+   RESPONSIVE DESIGN (MOBILE MAX 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    #app-container {
+        flex-direction: column-reverse; /* Mapa arriba, lista abajo */
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 50vh;
+        border-right: none;
+        border-top: 1px solid var(--border);
+    }
+
+    #map-container {
+        width: 100%;
+        height: 50vh;
+        flex: none;
+    }
+
+    /* Paneles de detalles / edición superpuestos en móvil */
+    .detail-panel {
+        left: 0 !important;
+        top: 50vh !important; /* Cubre exactamente el sidebar */
+        width: 100% !important;
+        height: 50vh !important;
+        bottom: 0 !important;
+        border-radius: 16px 16px 0 0;
+        z-index: 100 !important;
+        border: none;
+        border-top: 1px solid var(--border);
+    }
+    
+    #agenda-panel, #edit-panel, #edit-contact-panel {
+        left: 0 !important;
+    }
+
+    /* Ajuste login para que no se desborde */
+    .login-card {
+        width: 90%;
+        padding: 24px;
+        margin: 20px;
+    }
+}
+
