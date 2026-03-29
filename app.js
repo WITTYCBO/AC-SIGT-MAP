@@ -6,6 +6,15 @@ let contactsData = [];
 let activeLocation = null;
 let sessionPassword = ""; // Guardar la contraseña de la sesión actual
 
+// ====== Service Worker ======
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado', reg))
+            .catch(err => console.error('Error registrando Service Worker', err));
+    });
+}
+
 // DOM Elements
 const listContainer = document.getElementById('locations-list');
 const searchInput = document.getElementById('search-input');
@@ -34,6 +43,22 @@ const loginOverlay = document.getElementById('login-overlay');
 const loginForm = document.getElementById('login-form');
 const pwdInput = document.getElementById('login-pwd');
 const loginError = document.getElementById('login-error');
+
+// ====== Theme Toggle ======
+const themeToggleBtn = document.getElementById('theme-toggle');
+if (localStorage.getItem('theme') === 'light') {
+    document.documentElement.classList.add('light-mode');
+}
+if(themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('light-mode');
+        if (document.documentElement.classList.contains('light-mode')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+}
 
 // Loader Overlay
 function showLoading(show, text = 'Cargando datos...') {
@@ -171,6 +196,19 @@ function showDetails(loc) {
     activeLocation = loc;
     const typeClass = loc.type === 'Salón' ? 'type-salon' : 'type-empresa';
     
+    // Generar botones directos si hay datos
+    const cleanPhoneLoc = loc.phone ? loc.phone.replace(/[^\d+]/g, '') : '';
+    let actionButtons = `<div class="action-buttons-row">`;
+    if (loc.address) {
+        const dest = encodeURIComponent(loc.name + ', ' + loc.address);
+        actionButtons += `<a href="https://www.google.com/maps/dir/?api=1&destination=${dest}" target="_blank" class="btn-action-sm btn-gps"><span class="material-symbols-outlined" style="font-size:16px;">directions_car</span> Cómo llegar</a>`;
+    }
+    if (cleanPhoneLoc) {
+        actionButtons += `<a href="tel:${cleanPhoneLoc}" class="btn-action-sm btn-call"><span class="material-symbols-outlined" style="font-size:16px;">call</span> Llamar</a>`;
+        actionButtons += `<a href="https://wa.me/${cleanPhoneLoc.replace('+', '')}" target="_blank" class="btn-action-sm btn-wa"><span class="material-symbols-outlined" style="font-size:16px;">chat</span> WhatsApp</a>`;
+    }
+    actionButtons += `</div>`;
+
     let html = `
         <div class="location-type ${typeClass}" style="margin-top: 10px;">${loc.type}</div>
         <div class="detail-header">
@@ -179,6 +217,7 @@ function showDetails(loc) {
                 <span class="material-symbols-outlined" style="font-size: 16px;">map</span>
                 ${loc.address}
             </div>
+            ${actionButtons}
         </div>
 
         <div class="detail-section">
@@ -389,6 +428,18 @@ function renderContactsList(dataToRender) {
                 <span class="material-symbols-outlined" style="font-size: 16px;">call</span>
                 ${contact.phone || 'Sin número'}
             </div>
+        `;
+        
+        if (contact.phone && contact.phone.trim() !== "") {
+            const cleanPhone = contact.phone.replace(/[^\d+]/g, '');
+            item.innerHTML += `
+            <div class="action-buttons-row" style="margin-top: 4px; margin-bottom: 12px;">
+                <a href="tel:${cleanPhone}" class="btn-action-sm btn-call"><span class="material-symbols-outlined" style="font-size:14px;">call</span> Llamar</a>
+                <a href="https://wa.me/${cleanPhone.replace('+', '')}" target="_blank" class="btn-action-sm btn-wa"><span class="material-symbols-outlined" style="font-size:14px;">chat</span> WhatsApp</a>
+            </div>`;
+        }
+
+        item.innerHTML += `
             ${extraInfoHtml}
             ${obsHtml}
         `;

@@ -370,6 +370,14 @@ body, html {
     height: 100vh;
     position: relative;
     background-color: #242f3e; /* Dark map fallback color */
+    overflow: hidden; /* Oculta el encabezado de My Maps si le damos margen negativo al iframe */
+}
+
+#map-iframe {
+    width: 100%;
+    height: calc(100% + 55px); /* Compensamos el margen negativo para esconder el título de Google Maps */
+    margin-top: -55px; /* Empuja el mapa hacia arriba ocultando la barra gris */
+    border: 0;
 }
 
 #map {
@@ -644,32 +652,45 @@ select.form-input option {
 @media (max-width: 768px) {
     #app-container {
         flex-direction: column-reverse; /* Mapa arriba, lista abajo */
+        height: 100vh;
+        height: 100dvh; /* Chrome/Safari en iOS ajusta por la barra de navegación */
     }
 
     .sidebar {
         width: 100%;
-        height: 50vh;
+        height: 50%;
+        flex: 1 1 50%;
+        min-height: 0; /* CRÍTICO: Evita que el contenedor crezca infinitamente, permitiendo el scroll */
         border-right: none;
         border-top: 1px solid var(--border);
+        overflow: hidden; /* FUNDAMENTAL: Evita que el sidebar se estire, forzando a .locations-list a admitir scroll internamente */
     }
 
     #map-container {
         width: 100%;
-        height: 50vh;
-        flex: none;
+        height: 50%;
+        flex: 1 1 50%;
+        min-height: 0;
+    }
+
+    .locations-list, .detail-content {
+        -webkit-overflow-scrolling: touch; /* Suavidad en iOS */
     }
 
     /* Paneles de detalles / edición superpuestos en móvil */
     .detail-panel {
         left: 0 !important;
         top: 50vh !important; /* Cubre exactamente el sidebar */
+        top: 50dvh !important; /* Mejor ajuste en Safari/Chrome iOS */
         width: 100% !important;
         height: 50vh !important;
+        height: 50dvh !important;
         bottom: 0 !important;
         border-radius: 16px 16px 0 0;
         z-index: 100 !important;
         border: none;
         border-top: 1px solid var(--border);
+        overflow: hidden; /* Asegura que no crezca más allá del 50vh, permitiendo scroll interno en .detail-content */
     }
     
     #agenda-panel, #edit-panel, #edit-contact-panel {
@@ -684,3 +705,64 @@ select.form-input option {
     }
 }
 
+/* =========================================
+   LIGHT MODE & ACTION BUTTONS
+   ========================================= */
+:root.light-mode {
+    --bg-dark: #f3f4f6;
+    --bg-panel: rgba(255, 255, 255, 0.9);
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border: rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+:root.light-mode #search-input,
+:root.light-mode .form-input {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+}
+:root.light-mode .filter-btn:not(.active),
+:root.light-mode .filter-btn-agenda:not(.active) {
+    background: rgba(0,0,0,0.05);
+    color: var(--text-muted);
+}
+:root.light-mode .filter-btn:not(.active):hover,
+:root.light-mode .filter-btn-agenda:not(.active):hover {
+    background: rgba(0,0,0,0.1);
+    color: var(--text-main);
+}
+:root.light-mode .location-item,
+:root.light-mode .contact-card {
+    background: rgba(255,255,255,0.6);
+}
+
+.action-buttons-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-action-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-main);
+}
+:root.light-mode .btn-action-sm { background: rgba(0,0,0,0.05); }
+
+.btn-action-sm:hover { background: rgba(255,255,255,0.1); }
+:root.light-mode .btn-action-sm:hover { background: rgba(0,0,0,0.1); }
+
+.btn-wa { color: #25D366; border-color: rgba(37, 211, 102, 0.3); }
+.btn-call { color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+.btn-gps { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }

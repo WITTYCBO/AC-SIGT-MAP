@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA / Ocultar barra de navegación del navegador en móviles al añadir a pantalla de inicio -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AC Salones">
+    <link rel="manifest" href="manifest.json">
+
     <title>AC Salones - Control de Ubicaciones</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Google Fonts -->
@@ -36,9 +44,14 @@
         <!-- Barra Lateral Principal (Sidebar) -->
         <aside id="sidebar" class="sidebar">
             <header class="sidebar-header">
-                <div class="logo-container">
-                    <span class="material-symbols-outlined logo-icon">location_on</span>
-                    <h1>AC Salones Map</h1>
+                <div class="logo-container" style="justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-symbols-outlined logo-icon">location_on</span>
+                        <h1>AC Salones Map</h1>
+                    </div>
+                    <button id="theme-toggle" class="btn-icon" title="Cambiar Tema" style="background: transparent; border: none; padding: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">light_mode</span>
+                    </button>
                 </div>
                 <div class="search-box">
                     <span class="material-symbols-outlined search-icon">search</span>
@@ -206,13 +219,10 @@
 
         <!-- Contenedor del Mapa Embebido -->
         <main id="map-container">
-            <!-- Embebemos el enlace tal cual lo ve el usuario -->
+            <!-- Embebemos el enlace tal cual lo ve el usuario, limpiando estilos inline que manejaremos por CSS -->
             <iframe 
                 id="map-iframe"
                 src="https://www.google.com/maps/d/u/0/embed?mid=1PIF4MtsWShAjzFKoaUbBQCNv1VjdxrM" 
-                width="100%" 
-                height="100%" 
-                style="border:0;" 
                 allowfullscreen="" 
                 loading="lazy" 
                 referrerpolicy="no-referrer-when-downgrade">
