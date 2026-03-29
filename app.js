@@ -23,6 +23,15 @@ const detailPanel = document.getElementById('detail-panel');
 const detailContent = document.getElementById('detail-content');
 const closeDetailBtn = document.getElementById('close-detail');
 
+const mapIframe = document.getElementById('map-iframe');
+const ORIGINAL_MAP_URL = "https://www.google.com/maps/d/u/0/embed?mid=1PIF4MtsWShAjzFKoaUbBQCNv1VjdxrM";
+
+function restoreOriginalMap() {
+    if (mapIframe && mapIframe.src !== ORIGINAL_MAP_URL) {
+        mapIframe.src = ORIGINAL_MAP_URL;
+    }
+}
+
 const editPanel = document.getElementById('edit-panel');
 const closeEditBtn = document.getElementById('close-edit');
 const dataForm = document.getElementById('data-form');
@@ -195,6 +204,12 @@ function renderList(dataToRender) {
 function showDetails(loc) {
     activeLocation = loc;
     const typeClass = loc.type === 'Salón' ? 'type-salon' : 'type-empresa';
+    
+    // Centrar mapa dinámicamente
+    if (loc.address && mapIframe) {
+        const query = encodeURIComponent(loc.name + ", " + loc.address);
+        mapIframe.src = `https://maps.google.com/maps?q=${query}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
     
     // Generar botones directos si hay datos
     const cleanPhoneLoc = loc.phone ? loc.phone.replace(/[^\d+]/g, '') : '';
@@ -380,6 +395,7 @@ btnOpenAgenda.addEventListener('click', () => {
     agendaPanel.classList.remove('hidden');
     detailPanel.classList.add('hidden');
     editPanel.classList.add('hidden');
+    restoreOriginalMap();
 });
 
 closeAgendaBtn.addEventListener('click', () => {
@@ -491,6 +507,7 @@ filterBtns.forEach(btn => {
 closeDetailBtn.addEventListener('click', () => {
     detailPanel.classList.add('hidden');
     editPanel.classList.add('hidden');
+    restoreOriginalMap();
 });
 
 closeEditBtn.addEventListener('click', () => {
