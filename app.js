@@ -1,5 +1,5 @@
 // URL del Google Apps Script (Debe ser reemplazada por el usuario después de desplegar)
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUYvoJRFfHrauVZgCKLZQxVm2wMb0-5kFn-zT2LRTCSJcqz53TdED6KZrPZZlecWQRTg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyK--eLRSSXPPsSLSwuqiCG-Vm9CsC93_8x1NLY98ujoKsFbroIe61qLkq1a3mxq4EZGg/exec";
 
 let locationsData = [];
 let contactsData = [];
