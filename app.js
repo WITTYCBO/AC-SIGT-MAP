@@ -53,6 +53,30 @@ const loginForm = document.getElementById('login-form');
 const pwdInput = document.getElementById('login-pwd');
 const loginError = document.getElementById('login-error');
 
+// Video Elements
+const videoLoadingOverlay = document.getElementById('video-loading-overlay');
+const loadingVideo = document.getElementById('loading-video');
+
+if (loadingVideo) {
+    // Voltear el video horizontalmente para corregir el mapa de fondo
+    loadingVideo.style.transform = "translate(-50%, -50%) scaleX(-1)";
+    
+    // Ocultar el video de carga cuando termina o después de un tiempo máximo para no en bucle
+    const hideVideo = () => {
+        if(videoLoadingOverlay) {
+            videoLoadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                videoLoadingOverlay.style.display = 'none';
+            }, 500); // 0.5s transition
+        }
+    };
+
+    loadingVideo.addEventListener('ended', hideVideo);
+    
+    // Fallback por si no detecta el end o para forzar un límite (ej. 6 segundos)
+    setTimeout(hideVideo, 6000);
+}
+
 // ====== Theme Toggle ======
 const themeToggleBtn = document.getElementById('theme-toggle');
 if (localStorage.getItem('theme') === 'light') {
